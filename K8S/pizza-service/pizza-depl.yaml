@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pizza-deployment
+spec:
+  replicas: 1 #amount of running instances (pod count)
+  selector:
+    matchLabels:
+      app: pizza-service #deployment pod base name (prefix)
+  template:
+    metadata:
+      labels:
+        app: pizza-service #refers to deployment pod base name (prefix)
+    spec:
+      containers:
+        - name: pizza-service
+          image: thenamellessones/pizzasservice:latest #docker image
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pizza-cluster-ip-service #refered to by ingress API gateway
+spec:
+  type: ClusterIP
+  selector:
+    app: pizza-service #refers to deployment pod base name (prefix)
+  ports:
+      #can only be accessed from inside the cluster 
+      #all request to pizza-cluster-ip-service:80 will be forwarded to pizza-service:8080
+    - name: pizza-service
+      protocol: TCP
+      port: 80
+      targetPort: 80
+    - name: pizza-grpc-service
+      protocol: TCP
+      port: 666
+      targetPort: 666

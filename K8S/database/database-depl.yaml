@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: database-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql 
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:latest
+          ports:
+            - containerPort: 3306
+          env:
+              #database password for root user
+              #later used to connect to database
+            - name: MYSQL_ROOT_PASSWORD
+              value: root 
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: mysql-db
+      volumes:
+        - name: mysql-db
+          persistentVolumeClaim:
+            claimName: mysql-pizza-claim #previously created pvc fro 1Gi of persistant storage
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: database-cluster-ip-service
+spec:
+  type: ClusterIP
+  selector:
+    app: mysql
+  ports:
+    - name: mysql
+      protocol: TCP
+      port: 3306
+      targetPort: 3306
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: database-lb
+spec:
+  type: LoadBalancer
+  selector:
+    app: mysql
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306

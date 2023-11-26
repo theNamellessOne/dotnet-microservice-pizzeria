@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: favorite-deployment
+spec:
+  replicas: 1 #amount of running instances (pod count)
+  selector:
+    matchLabels:
+      app: favorite-service #deployment pod base name (prefix)
+  template:
+    metadata:
+      labels:
+        app: favorite-service #refers to deployment pod base name (prefix)
+    spec:
+      containers:
+        - name: favorite-service
+          image: thenamellessones/favoritesservice:latest #docker image
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: favorite-cluster-ip-service #refered to by ingress API gateway
+spec:
+  type: ClusterIP
+  selector:
+    app: favorite-service #refers to deployment pod base name (prefix)
+  ports:
+    #can only be accessed from inside the cluster 
+    #all request to favorite-cluster-ip-service:80 will be forwarded to favorite-service:8080
+    - name: favorite-service
+      protocol: TCP
+      port: 80
+      targetPort: 8080

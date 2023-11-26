@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment 
+metadata:
+  name: order-deployment
+spec:
+  replicas: 1 #amount of running instances (pod count)
+  selector:
+    matchLabels:
+      app: order-service #deployment pod base name (prefix)
+  template:
+    metadata:
+      labels:
+        app: order-service #refers to deployment pod base name (prefix)
+    spec:
+      containers:
+        - name: order-service
+          image: thenamellessones/ordersservice:latest #docker image
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-cluster-ip-service #refered to by ingress API gateway
+spec:
+  type: ClusterIP
+  selector:
+    app: order-service #refers to deployment pod base name (prefix)
+  ports:
+      #can only be accessed from inside the cluster 
+      #all request to order-cluster-ip-service:80 will be forwarded to order-service:8080
+    - name: order-service
+      protocol: TCP
+      port: 80
+      targetPort: 8080

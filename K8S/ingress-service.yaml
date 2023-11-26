@@ -1,0 +1,52 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-service
+  annotations:
+    kubernetes.io/ingress.class: nginx #use nginx
+    nginx.ingress.kubernetes.io/use-regex: 'true'
+spec:
+  rules:
+    - host: pizzeria.com
+      http:
+        paths:
+          #all requests to http://pizzeria.com/api/user
+          #will be forwarded to user-cluster-ip-service:80
+          #which in turn will forward them to user-service:80
+          - path: /api/user
+            pathType: Prefix
+            backend:
+              service:
+                name: user-cluster-ip-service
+                port:
+                  number: 80
+          #all requests to http://pizzeria.com/api/pizza
+          #will be forwarded to pizza-cluster-ip-service:80
+          #which in turn will forward them to pizza-service:80
+          - path: /api/pizza
+            pathType: Prefix
+            backend:
+              service:
+                name: pizza-cluster-ip-service
+                port:
+                  number: 80
+          #all requests to http://pizzeria.com/api/favorite
+          #will be forwarded to favorite-cluster-ip-service:80
+          #which in turn will forward them to favorite-service:8080
+          - path: /api/favorite
+            pathType: Prefix
+            backend:
+              service:
+                name: favorite-cluster-ip-service
+                port:
+                  number: 80
+          #all requests to http://pizzeria.com/api/order
+          #will be forwarded to favorite-cluster-ip-service:80
+          #which in turn will forward them to order-service:8080
+          - path: /api/order
+            pathType: Prefix
+            backend:
+              service:
+                name: order-cluster-ip-service
+                port:
+                  number: 80          

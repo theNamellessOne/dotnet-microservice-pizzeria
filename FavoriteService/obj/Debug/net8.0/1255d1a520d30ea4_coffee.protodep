@@ -1,0 +1,2 @@
+obj/Debug/net8.0/Protos/Coffee.cs \
+obj/Debug/net8.0/Protos/CoffeeGrpc.cs: Protos/coffee.proto

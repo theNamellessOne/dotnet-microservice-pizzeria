@@ -1,0 +1,23 @@
+syntax = "proto3";
+option csharp_namespace = "PizzaService";
+
+service GrpcPizza {
+  rpc GetAllPizzas (GetAllRequest) returns (PizzaResponse);
+}
+
+//запит
+message GetAllRequest {}
+
+//grpc реперзентація юзера
+message GrpcPizzaModel {
+  //тут після дорівнює стоїть не пряме значення, а типу як порядок аргументів, які будуть передані
+  int32 id = 1;
+  string name = 2;
+  string description = 3;
+  double basePrice = 4;
+}
+
+//actual response
+message PizzaResponse {
+  repeated GrpcPizzaModel pizza = 1;
+}
